@@ -1,59 +1,38 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { Configuration, OrderApi } from "@/output";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Request, Response } from "../../types";
 
-interface Request {
-  action: string;
-  state?: unknown;
-  context: {
-    pathname: string;
-    url: string;
-    widgetId: string;
-    userId: string;
-    [key: string]: unknown;
-  };
-  values?: Record<string, unknown>;
-  metadata?: Record<string, Record<string, unknown>>;
-
-  // order
-  // vehilce
-  // customer
-}
-
-interface Widget {
-  type: string;
-  [key: string]: unknown;
-}
-
-export interface DevkitWidgetConfig {
-  config: Record<string, string>;
-  id: string;
-  placement: "before" | "after";
-  target: string;
-  type: string;
-  initialContent: Widget[];
-}
-
-export interface StartResponse {
-  message?: string;
-  success: boolean;
-  widgets?: DevkitWidgetConfig[];
-}
-
-export interface ActionResponse {
-  content?: Widget[];
-  message?: string;
-  state?: unknown;
-  success: boolean;
-}
-
-type Response = StartResponse | ActionResponse;
 const config = new Configuration({
   basePath: process.env.SM_API_URL,
   accessToken: process.env.SM_ACCESS_TOKEN,
 });
 
-const initialCouponContent = [
+const initialRemoveCouponContent = [
+  {
+    type: "flexbox",
+    className: "flex flex-col gap-4",
+    content: [
+      {
+        type: "keyvaluepair",
+        label: "Coupon applied",
+        icon: "check-in-circle",
+        action: "remove-coupon",
+        actionType: "remove",
+      },
+      {
+        type: "typography",
+        content:
+          "Free Goodyear Assurance WeatherReady wiper blades with any oil change.",
+        level: 5,
+        variant: "body",
+        className: "text-gray-600 mt-2",
+      },
+    ],
+  },
+];
+
+const initialEnterCouponContent = [
   {
     type: "flexbox",
     className: "flex flex-col gap-4",
@@ -79,6 +58,12 @@ const initialCouponContent = [
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const orderWithCoupon: Record<string, { couponApplied: boolean }> = {
+  "6e88c751-e394-408d-a75c-5dffa02a4fe8": {
+    couponApplied: false,
+  },
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
@@ -90,18 +75,6 @@ export default async function handler(
         {
           config: {
             bgColor: "white",
-            title: "Coupons & Bundles",
-            variant: "large",
-          },
-          id: "df8a95cd-dd48-48cb-85f3-4faebd8bfaee",
-          placement: "before",
-          target: "expresslane.sidebar.vehicle",
-          type: "accordion",
-          initialContent: initialCouponContent,
-        },
-        {
-          config: {
-            bgColor: "white",
             icon: "doc-dollar",
             title: "Coupons & Bundles",
           },
@@ -109,7 +82,7 @@ export default async function handler(
           placement: "after",
           target: "order.sidebar.payments",
           type: "accordion",
-          initialContent: initialCouponContent,
+          initialContent: initialRemoveCouponContent,
         },
       ],
     });
@@ -117,7 +90,8 @@ export default async function handler(
   }
 
   const { action, context } = req.body as Request;
-  console.log({ method: req.method, action, body: req.body });
+  const orderId = req?.body?.context?.orderId;
+  const hasCoupon = orderWithCoupon[orderId]?.couponApplied;
   switch (action) {
     case "start": {
       const url = new URL(context?.url);
@@ -128,9 +102,7 @@ export default async function handler(
         const order = await orderApi.v3OrderIdGet({
           id: orderId ?? "",
         });
-        console.log({ order });
       } catch (error) {
-        console.error(error);
         res.status(500).json({
           success: false,
           message: "Failed to fetch order",
@@ -145,18 +117,6 @@ export default async function handler(
           {
             config: {
               bgColor: "white",
-              title: "Coupons & Bundles",
-              variant: "large",
-            },
-            id: "df8a95cd-dd48-48cb-85f3-4faebd8bfaee",
-            placement: "before",
-            target: "expresslane.sidebar.vehicle",
-            type: "accordion",
-            initialContent: initialCouponContent,
-          },
-          {
-            config: {
-              bgColor: "white",
               icon: "doc-dollar",
               title: "Coupons & Bundles",
             },
@@ -164,7 +124,9 @@ export default async function handler(
             placement: "after",
             target: "order.sidebar.payments",
             type: "accordion",
-            initialContent: initialCouponContent,
+            initialContent: hasCoupon
+              ? initialRemoveCouponContent
+              : initialEnterCouponContent,
           },
         ],
       });
