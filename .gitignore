@@ -33,3 +33,12 @@ coverage/
 # PWA
 public/sw.js
 public/workbox-*.js
+
+/openapi.json
+# output/
+
+# env
+.env
+
+db.json
+output

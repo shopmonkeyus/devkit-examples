@@ -1,5 +1,57 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { Configuration, OrderApi } from "@/output";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+interface Request {
+  action: string;
+  state?: unknown;
+  context: {
+    pathname: string;
+    url: string;
+    widgetId: string;
+    userId: string;
+    [key: string]: unknown;
+  };
+  values?: Record<string, unknown>;
+  metadata?: Record<string, Record<string, unknown>>;
+
+  // order
+  // vehilce
+  // customer
+}
+
+interface Widget {
+  type: string;
+  [key: string]: unknown;
+}
+
+export interface DevkitWidgetConfig {
+  config: Record<string, string>;
+  id: string;
+  placement: "before" | "after";
+  target: string;
+  type: string;
+  initialContent: Widget[];
+}
+
+export interface StartResponse {
+  message?: string;
+  success: boolean;
+  widgets?: DevkitWidgetConfig[];
+}
+
+export interface ActionResponse {
+  content?: Widget[];
+  message?: string;
+  state?: unknown;
+  success: boolean;
+}
+
+type Response = StartResponse | ActionResponse;
+const config = new Configuration({
+  basePath: process.env.SM_API_URL,
+  accessToken: process.env.SM_ACCESS_TOKEN,
+});
 
 const initialCouponContent = [
   {
@@ -31,10 +83,61 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  const { action } = req.body as Request;
-  console.log(req.body);
+  if (req.method !== "POST") {
+    res.status(200).json({
+      success: true,
+      widgets: [
+        {
+          config: {
+            bgColor: "white",
+            title: "Coupons & Bundles",
+            variant: "large",
+          },
+          id: "df8a95cd-dd48-48cb-85f3-4faebd8bfaee",
+          placement: "before",
+          target: "expresslane.sidebar.vehicle",
+          type: "accordion",
+          initialContent: initialCouponContent,
+        },
+        {
+          config: {
+            bgColor: "white",
+            icon: "doc-dollar",
+            title: "Coupons & Bundles",
+          },
+          id: "9d05a6bc-f5de-455c-a53f-7624e00d85b8",
+          placement: "after",
+          target: "order.sidebar.payments",
+          type: "accordion",
+          initialContent: initialCouponContent,
+        },
+      ],
+    });
+    return;
+  }
+
+  const { action, context } = req.body as Request;
+  console.log({ method: req.method, action, body: req.body });
   switch (action) {
     case "start": {
+      const url = new URL(context?.url);
+      const orderId = url.pathname.split("/").pop();
+
+      try {
+        const orderApi = new OrderApi(config);
+        const order = await orderApi.v3OrderIdGet({
+          id: orderId ?? "",
+        });
+        console.log({ order });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({
+          success: false,
+          message: "Failed to fetch order",
+        });
+        return;
+      }
+
       /// TODO: hit order PUT metdata  "mlc.coupon_applied"
       res.status(200).json({
         success: true,
