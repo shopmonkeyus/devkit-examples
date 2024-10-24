@@ -26,6 +26,7 @@ export interface DevkitWidgetConfig {
   id: string;
   placement: "before" | "after";
   target: string;
+  state?: any;
   type: string;
   initialContent: Widget[];
 }
@@ -39,7 +40,7 @@ export interface StartResponse {
 export interface ActionResponse {
   content?: Widget[];
   message?: string;
-  state?: unknown;
+  state?: any;
   success: boolean;
 }
 
