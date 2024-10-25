@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@shopmonkeyus/sdk':
-        specifier: https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.0.tgz
-        version: https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.0.tgz
+        specifier: https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.1.tgz
+        version: https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.1.tgz
       dotenv:
         specifier: 16.4.5
         version: 16.4.5
@@ -194,9 +194,9 @@ packages:
   '@rushstack/eslint-patch@1.10.4':
     resolution: {integrity: sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==}
 
-  '@shopmonkeyus/sdk@https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.0.tgz':
-    resolution: {tarball: https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.0.tgz}
-    version: 1.0.0
+  '@shopmonkeyus/sdk@https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.1.tgz':
+    resolution: {tarball: https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.1.tgz}
+    version: 1.0.1
 
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
@@ -1695,7 +1695,7 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.4': {}
 
-  '@shopmonkeyus/sdk@https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.0.tgz': {}
+  '@shopmonkeyus/sdk@https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.1.tgz': {}
 
   '@swc/counter@0.1.3': {}
 
