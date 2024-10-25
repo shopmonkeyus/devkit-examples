@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@shopmonkeyus/sdk": "https://storage.googleapis.com/shopmonkeyus-npm-public/shopmonkeyus-sdk-1.0.0.tgz",
     "dotenv": "16.4.5",
     "next": "14.2.11",
     "react": "^18",

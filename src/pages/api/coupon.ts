@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { Configuration, OrderApi } from "@/output";
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Request, Response } from "../../types";
 import { readDatabase, writeDatabase } from "@/util/db";
+const { Configuration, OrderApi } = require("@shopmonkeyus/sdk");
 
 const config = new Configuration({
   basePath: process.env.SM_API_URL,
