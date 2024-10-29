@@ -12,9 +12,9 @@ const config = new Configuration({
 
 const initialRemoveCouponContent = [
   {
-    type: "flexbox",
+    type: "div",
     className: "flex flex-col gap-4",
-    content: [
+    components: [
       {
         type: "keyvaluepair",
         label: "Coupon applied",
@@ -36,14 +36,15 @@ const initialRemoveCouponContent = [
 
 const initialEnterCouponContentWithServiceNotFound = [
   {
-    type: "flexbox",
+    type: "div",
     className: "flex flex-col gap-4",
-    content: [
+    components: [
       {
         type: "field",
         id: "coupon_code",
         error: "No valid service found for this coupon",
         autoFocus: true,
+        name: "something",
         caption: "Enter the card number to apply member discount to this order",
         placeholder: "Enter a code ...",
       },
@@ -61,9 +62,9 @@ const initialEnterCouponContentWithServiceNotFound = [
 
 const initialEnterCouponContentWithError = [
   {
-    type: "flexbox",
+    type: "div",
     className: "flex flex-col gap-4",
-    content: [
+    components: [
       {
         type: "field",
         id: "coupon_code",
@@ -86,9 +87,9 @@ const initialEnterCouponContentWithError = [
 
 const initialEnterCouponContent = [
   {
-    type: "flexbox",
+    type: "div",
     className: "flex flex-col gap-4",
-    content: [
+    components: [
       {
         type: "field",
         id: "coupon_code",
@@ -117,12 +118,14 @@ export default async function handler(
   if (req.method !== "POST") {
     res.status(200).json({
       success: true,
+      type: "action",
     });
     return;
   }
   const orderApi = new OrderApi(config);
   const { action, context } = req.body as Request;
   const url = new URL(context?.url);
+
   const orderId = url.pathname.split("/").pop() ?? "";
 
   switch (action) {
@@ -135,6 +138,7 @@ export default async function handler(
         res.status(404).json({
           success: false,
           message: "Failed to fetch order",
+          type: "action",
         });
         return;
       }
@@ -142,7 +146,8 @@ export default async function handler(
       const hasCoupon = readDatabase(orderId, "coupons-order")?.couponApplied;
       res.status(200).json({
         success: true,
-        widgets: [
+        type: "start",
+        containers: [
           {
             config: {
               bgColor: "white",
@@ -154,7 +159,7 @@ export default async function handler(
             target: "order.sidebar.payments",
             type: "accordion",
             state: hasCoupon ? { code: hasCoupon } : undefined,
-            initialContent: hasCoupon
+            components: hasCoupon
               ? initialRemoveCouponContent
               : initialEnterCouponContent,
           },
@@ -186,6 +191,7 @@ export default async function handler(
         res.status(404).json({
           success: false,
           message: "Failed to fetch order",
+          type: "action",
         });
         return;
       }
@@ -195,7 +201,9 @@ export default async function handler(
       res.status(200).json({
         success: true,
         state: undefined,
-        content: initialEnterCouponContent,
+        type: "action",
+
+        components: initialEnterCouponContent,
       });
       return;
     }
@@ -206,7 +214,8 @@ export default async function handler(
         res.status(200).json({
           success: true,
           state: undefined,
-          content: initialEnterCouponContentWithError,
+          type: "action",
+          components: initialEnterCouponContentWithError,
         });
         return;
       }
@@ -222,7 +231,8 @@ export default async function handler(
           res.status(200).json({
             success: true,
             state: undefined,
-            content: initialEnterCouponContentWithServiceNotFound,
+            type: "action",
+            components: initialEnterCouponContentWithServiceNotFound,
           });
           return;
         }
@@ -238,6 +248,7 @@ export default async function handler(
         res.status(404).json({
           success: false,
           message: "Failed to fetch order",
+          type: "action",
         });
         return;
       }
@@ -247,7 +258,8 @@ export default async function handler(
       res.status(200).json({
         success: true,
         state: { code },
-        content: initialRemoveCouponContent,
+        type: "action",
+        components: initialRemoveCouponContent,
       });
       return;
     }

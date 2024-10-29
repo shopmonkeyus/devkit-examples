@@ -4,44 +4,42 @@ export interface Request {
   context: {
     pathname: string;
     url: string;
-    widgetId: string;
+    containerId: string;
     userId: string;
     [key: string]: unknown;
   };
   values?: Record<string, unknown>;
   metadata?: Record<string, Record<string, unknown>>;
-
-  // order
-  // vehilce
-  // customer
 }
 
-export interface Widget {
+export interface Component {
   type: string;
   [key: string]: unknown;
 }
 
-export interface DevkitWidgetConfig {
+export interface DevkitContainerConfig {
   config: Record<string, string>;
   id: string;
   placement: "before" | "after";
   target: string;
   state?: any;
   type: string;
-  initialContent: Widget[];
+  components: Component[];
 }
 
 export interface StartResponse {
   message?: string;
   success: boolean;
-  widgets?: DevkitWidgetConfig[];
+  containers?: DevkitContainerConfig[];
+  type: "start";
 }
 
 export interface ActionResponse {
-  content?: Widget[];
+  components?: Component[];
   message?: string;
   state?: any;
   success: boolean;
+  type: "action";
 }
 
 export type Response = StartResponse | ActionResponse;
