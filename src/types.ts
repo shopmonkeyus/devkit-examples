@@ -39,6 +39,7 @@ export interface ActionResponse {
   message?: string;
   state?: any;
   success: boolean;
+  refresh?: boolean;
   type: "action";
 }
 

@@ -4,112 +4,15 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Request, Response } from "../../types";
 import { readDatabase, writeDatabase } from "@/util/db";
 import { Configuration, OrderApi } from "@shopmonkeyus/sdk";
+import {
+  EnterCouponComponents,
+  RemoveCouponComponents,
+} from "@/components/coupon";
 
 const config = new Configuration({
   basePath: process.env.SM_API_URL,
   accessToken: process.env.SM_ACCESS_TOKEN,
 });
-
-const initialRemoveCouponContent = [
-  {
-    type: "div",
-    className: "flex flex-col gap-4",
-    components: [
-      {
-        type: "keyvaluepair",
-        label: "Coupon applied",
-        icon: "check-in-circle",
-        action: "remove-coupon",
-        actionType: "remove",
-      },
-      {
-        type: "typography",
-        content:
-          "Free Goodyear Assurance WeatherReady wiper blades with any oil change.",
-        level: 5,
-        variant: "body",
-        className: "text-gray-600 mt-2",
-      },
-    ],
-  },
-];
-
-const initialEnterCouponContentWithServiceNotFound = [
-  {
-    type: "div",
-    className: "flex flex-col gap-4",
-    components: [
-      {
-        type: "field",
-        id: "coupon_code",
-        error: "No valid service found for this coupon",
-        autoFocus: true,
-        name: "something",
-        caption: "Enter the card number to apply member discount to this order",
-        placeholder: "Enter a code ...",
-      },
-      {
-        type: "button",
-        content: "Apply",
-        variant: "secondary",
-        className: "w-full",
-        enabledBy: "coupon_code",
-        action: "apply-coupon",
-      },
-    ],
-  },
-];
-
-const initialEnterCouponContentWithError = [
-  {
-    type: "div",
-    className: "flex flex-col gap-4",
-    components: [
-      {
-        type: "field",
-        id: "coupon_code",
-        error: "Invalid coupon code",
-        autoFocus: true,
-        caption: "Enter the card number to apply member discount to this order",
-        placeholder: "Enter a code ...",
-      },
-      {
-        type: "button",
-        content: "Apply",
-        variant: "secondary",
-        className: "w-full",
-        enabledBy: "coupon_code",
-        action: "apply-coupon",
-      },
-    ],
-  },
-];
-
-const initialEnterCouponContent = [
-  {
-    type: "div",
-    className: "flex flex-col gap-4",
-    components: [
-      {
-        type: "field",
-        id: "coupon_code",
-        autoFocus: true,
-        caption: "Enter the card number to apply member discount to this order",
-        placeholder: "Enter a code ...",
-      },
-      {
-        type: "button",
-        content: "Apply",
-        variant: "secondary",
-        className: "w-full",
-        enabledBy: "coupon_code",
-        action: "apply-coupon",
-      },
-    ],
-  },
-];
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function handler(
   req: NextApiRequest,
@@ -160,8 +63,8 @@ export default async function handler(
             type: "accordion",
             state: hasCoupon ? { code: hasCoupon } : undefined,
             components: hasCoupon
-              ? initialRemoveCouponContent
-              : initialEnterCouponContent,
+              ? RemoveCouponComponents
+              : EnterCouponComponents(),
           },
         ],
       });
@@ -192,18 +95,17 @@ export default async function handler(
           success: false,
           message: "Failed to fetch order",
           type: "action",
+          refresh: true,
         });
         return;
       }
       writeDatabase(orderId, "coupons-order", { couponApplied: undefined });
-
-      await sleep(1_000);
       res.status(200).json({
         success: true,
         state: undefined,
         type: "action",
-
-        components: initialEnterCouponContent,
+        refresh: true,
+        components: EnterCouponComponents(),
       });
       return;
     }
@@ -215,7 +117,7 @@ export default async function handler(
           success: true,
           state: undefined,
           type: "action",
-          components: initialEnterCouponContentWithError,
+          components: EnterCouponComponents("Invalid coupon code"),
         });
         return;
       }
@@ -232,7 +134,10 @@ export default async function handler(
             success: true,
             state: undefined,
             type: "action",
-            components: initialEnterCouponContentWithServiceNotFound,
+            refresh: true,
+            components: EnterCouponComponents(
+              "No valid service found for this coupon"
+            ),
           });
           return;
         }
@@ -252,14 +157,14 @@ export default async function handler(
         });
         return;
       }
-      await sleep(1_000);
 
       writeDatabase(orderId, "coupons-order", { couponApplied: code });
       res.status(200).json({
         success: true,
         state: { code },
         type: "action",
-        components: initialRemoveCouponContent,
+        refresh: true,
+        components: RemoveCouponComponents,
       });
       return;
     }
