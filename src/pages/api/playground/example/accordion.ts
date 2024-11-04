@@ -1,7 +1,6 @@
 import { EnterCouponComponents } from "@/components/coupon";
+import { sleep } from "@/util/sleep";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const CouponContainer = (error?: string) => ({
   success: true,

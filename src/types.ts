@@ -30,7 +30,7 @@ export interface DevkitContainerConfig {
 export interface StartResponse {
   message?: string;
   success: boolean;
-  containers?: DevkitContainerConfig[];
+  container: DevkitContainerConfig;
   type: "start";
 }
 
