@@ -14,17 +14,17 @@ export default function handler(
 ) {
   res.status(200).json([
     {
+      id: "accordion",
+      route: "/api/playground/example/accordion",
+      name: "Accordion",
+      description: "Use a basic template with a text input and a button",
+    },
+    {
       id: "all",
       route: "/api/playground/example/all",
       name: "All Components",
       description:
         "Preview all available components to customize your mini app",
-    },
-    {
-      id: "accordion",
-      route: "/api/playground/example/accordion",
-      name: "Accordion",
-      description: "Use a basic template with a text input and a button",
     },
     {
       id: "loading",
