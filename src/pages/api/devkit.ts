@@ -18,9 +18,6 @@ export default async function handler(
             title: "Coupons & Bundles",
           },
           id: "9d05a6bc-f5de-455c-a53f-7624e00d85b8",
-          placement: "after",
-          target: "order.sidebar.payments",
-          type: "accordion",
           components: [
             {
               type: "div",
