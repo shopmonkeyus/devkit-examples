@@ -8,6 +8,7 @@ import {
   EnterCouponComponents,
   RemoveCouponComponents,
 } from "@/components/coupon";
+import { sleep } from "@/util/sleep";
 
 const config = new Configuration({
   basePath: process.env.SM_API_URL,
@@ -31,6 +32,16 @@ export default async function handler(
 
   const orderId = url.pathname.split("/").pop() ?? "";
 
+  await sleep(10000);
+
+  if (req.query.error) {
+    res.status(500).json({
+      success: false,
+      message: "Mock error",
+      type: "action",
+    });
+  }
+
   switch (action) {
     case "start": {
       try {
@@ -50,23 +61,21 @@ export default async function handler(
       res.status(200).json({
         success: true,
         type: "start",
-        containers: [
-          {
-            config: {
-              bgColor: "white",
-              icon: "doc-dollar",
-              title: "Coupons & Bundles",
-            },
-            id: "9d05a6bc-f5de-455c-a53f-7624e00d85b8",
-            placement: "after",
-            target: "order.sidebar.payments",
-            type: "accordion",
-            state: hasCoupon ? { code: hasCoupon } : undefined,
-            components: hasCoupon
-              ? RemoveCouponComponents
-              : EnterCouponComponents(),
+        container: {
+          config: {
+            bgColor: "white",
+            icon: "doc-dollar",
+            title: "Coupons & Bundles",
           },
-        ],
+          id: "9d05a6bc-f5de-455c-a53f-7624e00d85b8",
+          placement: "after",
+          target: "order.sidebar.payments",
+          type: "accordion",
+          state: hasCoupon ? { code: hasCoupon } : undefined,
+          components: hasCoupon
+            ? RemoveCouponComponents
+            : EnterCouponComponents(),
+        },
       });
       return;
     }
