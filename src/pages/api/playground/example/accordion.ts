@@ -30,8 +30,12 @@ export default async function handler(
   switch (req.query.mod) {
     case "loading":
       await sleep(2000);
+      res.status(200).json(CouponContainer());
+      break;
     case "loading-long":
       await sleep(5000);
+      res.status(200).json(CouponContainer());
+      break;
     case "error":
       res.status(200).json(CouponContainer("This text value is invalid"));
       break;
