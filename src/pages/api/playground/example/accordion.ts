@@ -4,7 +4,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const CouponContainer = (error?: string) => ({
   success: true,
-  type: "start",
   container: {
     config: {
       className: "border-none rounded-lg",
