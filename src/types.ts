@@ -18,12 +18,9 @@ export interface Component {
 }
 
 export interface DevkitContainerConfig {
-  config: Record<string, string>;
+  config: Record<string, string | boolean | number>;
   id: string;
-  placement: "before" | "after";
-  target: string;
   state?: any;
-  type: string;
   components: Component[];
 }
 
