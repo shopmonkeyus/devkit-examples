@@ -17,7 +17,7 @@ export const EnterCouponComponents = (error?: string) => {
           type: "button",
           content: "Apply",
           variant: "secondary",
-          className: "w-full",
+          className: "w-full border",
           enabledBy: "coupon_code",
           action: "apply-coupon",
         },

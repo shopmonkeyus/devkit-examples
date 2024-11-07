@@ -15,6 +15,21 @@ const config = new Configuration({
   accessToken: process.env.SM_ACCESS_TOKEN,
 });
 
+const defaultConfig = {
+  bgColor: "white",
+  icon: "doc-dollar",
+  title: "Coupons & Bundles",
+  open: true,
+};
+
+const expressConfig = {
+  className: "border-none rounded-lg bg-gray-100",
+  icon: "doc-dollar",
+  title: "Coupons & Bundles",
+  variant: "large",
+  open: true,
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
@@ -26,13 +41,20 @@ export default async function handler(
     });
     return;
   }
+
+  const configUI = req.query.express ? expressConfig : defaultConfig;
   const orderApi = new OrderApi(config);
   const { action, context } = req.body as Request;
   const url = new URL(context?.url);
 
-  const orderId = url.pathname.split("/").pop() ?? "";
+  const defaultOrderId = url.pathname.split("/").pop();
+  const expressLaneOrderId = url.pathname.split("/")[2];
 
-  await sleep(10000);
+  const orderId = url.pathname.includes("express")
+    ? expressLaneOrderId ?? ""
+    : defaultOrderId ?? "";
+
+  await sleep(1000);
 
   if (req.query.error) {
     res.status(500).json({
@@ -62,11 +84,7 @@ export default async function handler(
         success: true,
         type: "start",
         container: {
-          config: {
-            bgColor: "white",
-            icon: "doc-dollar",
-            title: "Coupons & Bundles",
-          },
+          config: configUI,
           id: "9d05a6bc-f5de-455c-a53f-7624e00d85b8",
           state: hasCoupon ? { code: hasCoupon } : undefined,
           components: hasCoupon
