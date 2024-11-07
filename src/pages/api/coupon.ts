@@ -75,6 +75,10 @@ export default async function handler(
   const orderId =
     typeof context.orderId === "string" ? context.orderId : undefined;
 
+  if (!process.env.SM_API_URL || !process.env.SM_ACCESS_TOKEN) {
+    throw new Error("Missing environment variables");
+  }
+
   console.log(context);
 
   if (!orderId) {
