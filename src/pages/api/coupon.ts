@@ -45,14 +45,19 @@ export default async function handler(
   const configUI = req.query.express ? expressConfig : defaultConfig;
   const orderApi = new OrderApi(config);
   const { action, context } = req.body as Request;
-  const url = new URL(context?.url);
+  const orderId =
+    typeof context.orderId === "string" ? context.orderId : undefined;
 
-  const defaultOrderId = url.pathname.split("/").pop();
-  const expressLaneOrderId = url.pathname.split("/")[2];
+  console.log(context);
 
-  const orderId = url.pathname.includes("express")
-    ? expressLaneOrderId ?? ""
-    : defaultOrderId ?? "";
+  if (!orderId) {
+    res.status(404).json({
+      success: false,
+      message: "No order ID found",
+      type: "action",
+    });
+    return;
+  }
 
   await sleep(1000);
 

@@ -1,3 +1,8 @@
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+export type JsonObject = { [key: string]: JsonValue };
+export type JsonArray = JsonValue[];
+
 export interface Request {
   action: string;
   state?: any;
@@ -6,7 +11,7 @@ export interface Request {
     url: string;
     containerId: string;
     userId: string;
-    [key: string]: unknown;
+    [key: string]: JsonValue;
   };
   values?: Record<string, unknown>;
   metadata?: Record<string, Record<string, unknown>>;
