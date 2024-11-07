@@ -9,6 +9,31 @@ import {
   RemoveCouponComponents,
 } from "@/components/coupon";
 import { sleep } from "@/util/sleep";
+import crypto from "crypto";
+
+export const createSignatureAndThrowIfInvalid = (
+  req: NextApiRequest,
+  secret?: string
+) => {
+  if (!secret) {
+    throw new Error("No secret provided");
+  }
+
+  const msgId = req.headers["x-devkit-id"];
+  const timestamp = req.headers["x-devkit-timestamp"];
+  const signature = req.headers["x-devkit-signature"];
+  const payload = req.body;
+
+  const toSign = `${msgId}.${timestamp}.${JSON.stringify(payload)}`;
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(toSign)
+    .digest("hex");
+
+  if (signature !== expectedSignature) {
+    throw new Error("Invalid signature");
+  }
+};
 
 const config = new Configuration({
   basePath: process.env.SM_API_URL,
@@ -41,6 +66,8 @@ export default async function handler(
     });
     return;
   }
+
+  createSignatureAndThrowIfInvalid(req, process.env.SM_SECRET ?? "");
 
   const configUI = req.query.express ? expressConfig : defaultConfig;
   const orderApi = new OrderApi(config);
