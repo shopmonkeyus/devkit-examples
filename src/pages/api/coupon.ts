@@ -25,12 +25,12 @@ export const createSignatureAndThrowIfInvalid = (
   const payload = req.body;
 
   const toSign = `${msgId}.${timestamp}.${JSON.stringify(payload)}`;
-  const expectedSignature = crypto
+  const reconstructedSignature = crypto
     .createHmac("sha256", secret)
     .update(toSign)
     .digest("hex");
 
-  if (signature !== expectedSignature) {
+  if (signature?.includes(reconstructedSignature) === false) {
     throw new Error("Invalid signature");
   }
 };
@@ -78,8 +78,6 @@ export default async function handler(
   if (!process.env.SM_API_URL || !process.env.SM_ACCESS_TOKEN) {
     throw new Error("Missing environment variables");
   }
-
-  console.log(context);
 
   if (!orderId) {
     res.status(404).json({
